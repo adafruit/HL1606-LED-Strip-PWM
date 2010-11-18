@@ -1,7 +1,9 @@
+// (c) Adafruit Industries / Limor Fried 2010. Released under MIT license.
+
 #include <WProgram.h>
 
 // some spi defines
-// Duemilanove and mini w/328
+// Classic Arduinos
 #if defined(__AVR_ATmega328P__) || defined(__AVR_ATmega328__)|| defined(__AVR_ATmega168__) 
   #define SPI_PORT PORTB
   #define SPI_DDR  DDRB
@@ -10,8 +12,8 @@
   #define SPI_SCK  5       // Arduino pin 13.
   #define DATA_PIN 11
   #define CLOCK_PIN 13
-// Mega.
-#elif defined(__AVR_ATmega1280__)
+// Megas
+#elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
   #define SPI_PORT PORTB
   #define SPI_DDR  DDRB
   #define SPI_PIN  PINB

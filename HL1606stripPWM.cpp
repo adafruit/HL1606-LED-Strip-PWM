@@ -1,4 +1,10 @@
 #include "HL1606stripPWM.h"
+// Written from scratch, but inspired by 
+// http://waitingforbigo.com/2010/10/02/second-preview-release-of-fastspi_led-library
+// This library can PWM an HL1606 strip with 3 or 4 bits of color per LED
+// See the example sketches for more detailed usage
+
+// (c) Adafruit Industries / Limor Fried 2010. Released under MIT license.
 
 
 static uint8_t pwmincr;
