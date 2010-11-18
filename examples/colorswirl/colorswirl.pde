@@ -2,6 +2,8 @@
 // public domain, enjoy!
 
 #include "HL1606stripPWM.h"
+// This library uses Timer 2 for PWM counting and 3 * numLEDs bytes of RAM
+// and Arduino pins 11 & 13 (Mega, 51 & 52)
 
 // First value passed is how many LEDs are in your HL1606 strand
 // fewer LEDs means less work
@@ -11,7 +13,8 @@
 // MUST BE AN OUTPUT!
 int latchPin = 10;
 HL1606stripPWM strip = HL1606stripPWM(32, latchPin); 
-  
+
+
 void setup() {
   Serial.begin(9600);
   Serial.println("hello!");
