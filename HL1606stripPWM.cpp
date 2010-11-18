@@ -47,7 +47,11 @@ void HL1606stripPWM::begin(void) {
   timerinit();
 
   // go!
+#if defined(__AVR_ATmega32U4__) 
+  TIMSK3 = _BV(OCIE3A);
+#else
   TIMSK2 = _BV(OCIE2A);             // run our strip-writing interrupt
+#endif
 }
 
 
@@ -61,16 +65,26 @@ void HL1606stripPWM::timerinit(void) {
   
   time *= 100;            // calculate what percentage of CPU we can use (multiply by time)
   time /= CPUmaxpercent;
+
   
   // set up the interrupt to write to the entire strip
   // Each pixel requires a 1-byte SPI transfer, so with a n-pixel strip, thats n bytes at 1 MHz
   // which makes for a 1 MHz / n PWM frequency. Say for a 100 LED strip, we can update no faster
   // than 10 KHz. Lets make it 1 KHz to start
+
+#if defined(__AVR_ATmega32U4__) 
+  // for the atmega32u4 we'll use counter #3
+  TCCR3A = 0;
+  TCCR3B = _BV(CS32) | _BV(WGM32);  // CTC mode, /256 clock
+  OCR3A = (F_CPU/256) / (1000 / time);
+  TCNT3 = 0;
+#else
   // we'll use timer 2 in CTC mode
   TCCR2A = _BV(WGM21);     // CTC mode
   TCCR2B =  _BV(CS21) | _BV(CS22);   // 256 divider, run timer2 at 62.5 KHz (16MHz/256)
   OCR2A = (F_CPU/256) / (1000 / time);
   TCNT2 = 0;
+#endif
 } 
 
 
@@ -82,7 +96,11 @@ void HL1606stripPWM::setLEDcolorPWM(uint8_t n, uint8_t r, uint8_t g, uint8_t b) 
 }
 
 
+#if defined(__AVR_ATmega32U4__) 
+ISR(TIMER3_COMPA_vect) {
+#else
 ISR(TIMER2_COMPA_vect) {
+#endif
   uint8_t i, d;
   
   // write out data to strip 

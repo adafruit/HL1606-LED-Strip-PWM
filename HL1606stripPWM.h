@@ -21,6 +21,14 @@
   #define SPI_SCK  1       // Arduino pin 52.
   #define DATA_PIN 51
   #define CLOCK_PIN 52
+#elif defined(__AVR_ATmega32U4__)
+  #define SPI_PORT PORTB
+  #define SPI_DDR  DDRB
+  #define SPI_PIN  PINB
+  #define SPI_MOSI 2       // Teensyduino pin 2
+  #define SPI_SCK  1       // Teensyduino pin 1
+  #define DATA_PIN 2
+  #define CLOCK_PIN 1
 #endif
 
 class HL1606stripPWM {
