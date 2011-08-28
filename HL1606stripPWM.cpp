@@ -99,6 +99,14 @@ void HL1606stripPWM::set(uint8_t n, uint8_t r, uint8_t g, uint8_t b) {
   this->set(n, r, g, b);
 }
 
+void HL1606stripPWM::setLEDcolorPWM(uint8_t n, uint32_t color) {
+  // >> has operator precedence over &
+  this->setLEDcolorPWM(n, color >> 16 & 0xFF, color >> 8 & 0xFF, color >> 0 & 0xFF);
+}
+
+void HL1606stripPWM::set(uint8_t n, uint32_t color) {
+  this->setLEDcolorPWM(n, color);
+}
 
 #if defined(__AVR_ATmega32U4__)
 ISR(TIMER3_COMPA_vect) {
