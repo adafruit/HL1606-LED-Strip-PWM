@@ -1,5 +1,5 @@
 #include "HL1606stripPWM.h"
-// Written from scratch, but inspired by 
+// Written from scratch, but inspired by
 // http://waitingforbigo.com/2010/10/02/second-preview-release-of-fastspi_led-library
 // This library can PWM an HL1606 strip with 3 or 4 bits of color per LED
 // See the example sketches for more detailed usage
@@ -47,7 +47,7 @@ void HL1606stripPWM::begin(void) {
   timerinit();
 
   // go!
-#if defined(__AVR_ATmega32U4__) 
+#if defined(__AVR_ATmega32U4__)
   TIMSK3 = _BV(OCIE3A);
 #else
   TIMSK2 = _BV(OCIE2A);             // run our strip-writing interrupt
@@ -62,17 +62,17 @@ void HL1606stripPWM::timerinit(void) {
   time *= SPIspeedDiv;    // larger dividers = more time per bit
   time *= 1000;           // time in milliseconds
   time /= F_CPU;          // multiplied by how long it takes for one instruction (nverse of cpu)
-  
+
   time *= 100;            // calculate what percentage of CPU we can use (multiply by time)
   time /= CPUmaxpercent;
 
-  
+
   // set up the interrupt to write to the entire strip
   // Each pixel requires a 1-byte SPI transfer, so with a n-pixel strip, thats n bytes at 1 MHz
   // which makes for a 1 MHz / n PWM frequency. Say for a 100 LED strip, we can update no faster
   // than 10 KHz. Lets make it 1 KHz to start
 
-#if defined(__AVR_ATmega32U4__) 
+#if defined(__AVR_ATmega32U4__)
   // for the atmega32u4 we'll use counter #3
   TCCR3A = 0;
   TCCR3B = _BV(CS32) | _BV(WGM32);  // CTC mode, /256 clock
@@ -85,43 +85,47 @@ void HL1606stripPWM::timerinit(void) {
   OCR2A = (F_CPU/256) / (1000 / time);
   TCNT2 = 0;
 #endif
-} 
+}
 
 
 
 void HL1606stripPWM::setLEDcolorPWM(uint8_t n, uint8_t r, uint8_t g, uint8_t b) {
-     redPWM[n] = r; 
-     greenPWM[n] = g; 
+     redPWM[n] = r;
+     greenPWM[n] = g;
      bluePWM[n] = b;
 }
 
+void HL1606stripPWM::set(uint8_t n, uint8_t r, uint8_t g, uint8_t b) {
+  this->set(n, r, g, b);
+}
 
-#if defined(__AVR_ATmega32U4__) 
+
+#if defined(__AVR_ATmega32U4__)
 ISR(TIMER3_COMPA_vect) {
 #else
 ISR(TIMER2_COMPA_vect) {
 #endif
   uint8_t i, d;
-  
-  // write out data to strip 
+
+  // write out data to strip
   for (i=0; i< nLEDs; i++) {
     d = 0x80;          // set the latch bit
     // calculate the next LED's byte
     if (pwmcounter < redPWM[i]) {
       d |= 0x04;
-    } 
+    }
     if (pwmcounter < greenPWM[i]) {
       d |= 0x10;
-    } 
+    }
     if (pwmcounter < bluePWM[i]) {
       d |= 0x01;
-    } 
+    }
 
     // check that previous xfer completed
-    while(!(SPSR & _BV(SPIF))); 
- 
+    while(!(SPSR & _BV(SPIF)));
+
     // send new data
-    SPDR = d; 
+    SPDR = d;
   }
 
   // increment our PWM counter
@@ -141,13 +145,13 @@ void HL1606stripPWM::SPIinit(void) {
   pinMode(DATA_PIN, OUTPUT);
   pinMode(CLOCK_PIN, OUTPUT);
   pinMode(latchPin, OUTPUT);
-  
+
   // set up high speed SPI for 500 KHz
   // The datasheet says that the clock pulse width must be > 300ns. Two pulses > 600ns that would
   // make the max frequency 1.6 MHz - fat chance getting that out of HL1606's though
   SPCR = _BV(SPE) | _BV(MSTR);   // enable SPI master mode
   setSPIdivider(SPIspeedDiv);          // SPI clock is FCPU/32 = 500 Khz for most arduinos
-  
+
   // we send a fake SPI byte to get the 'finished' bit set in the register, dont remove!!!
   SPDR = 0;
 }
@@ -165,23 +169,23 @@ void HL1606stripPWM::setSPIdivider(uint8_t spispeed) {
       // no bits set
       break;
     case 8:
-      SPCR |= _BV(SPR0); 
+      SPCR |= _BV(SPR0);
       SPSR |= _BV(SPI2X);
       break;
     case 16:
-      SPCR |= _BV(SPR0); 
+      SPCR |= _BV(SPR0);
       break;
     case 32:
-      SPCR |= _BV(SPR1); 
+      SPCR |= _BV(SPR1);
       SPSR |= _BV(SPI2X);
       break;
     case 64:
-      SPCR |= _BV(SPR1); 
+      SPCR |= _BV(SPR1);
       break;
     default:      // slowest
     case 128:
       SPCR |= _BV(SPR1);
-      SPCR |= _BV(SPR0);  
+      SPCR |= _BV(SPR0);
   }
 
   timerinit();
