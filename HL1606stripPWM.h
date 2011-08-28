@@ -76,6 +76,13 @@ class HL1606stripPWM {
   void setPWMbits(uint8_t b);
   uint8_t getPWMbits();
 
+  // 0 is off, 8 is full brightness
+  // However, there will only be getPWMbits()+1 actual levels of brightness, not including off
+  void setBrightness(uint8_t b);
+  uint8_t getBrightness();
+  // Set brightness to next lowest level, or back to brightest if off. Returns new brightness.
+  uint8_t nextBrightness();
+
   uint8_t getCPUmax();
   void setCPUmax(uint8_t cpumax);
 };

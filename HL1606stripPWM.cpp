@@ -18,6 +18,9 @@ static uint8_t *bluePWM;
 // how many LEDs
 static uint8_t nLEDs;
 
+// Brightness divider: shift all levels this many bits to the right, dimming the display
+static uint8_t PWMshifter;
+
 // the latch pin
 static uint8_t latchPin;
 
@@ -30,6 +33,7 @@ HL1606stripPWM::HL1606stripPWM(uint8_t n, uint8_t l) {
 
   pwmcounter = 0;
   PWMbits = 3;
+  PWMshifter = 0;
   CPUmaxpercent = 70;
   pwmincr = 256 / (1 << PWMbits);
   SPIspeedDiv = 32;
@@ -125,13 +129,13 @@ ISR(TIMER2_COMPA_vect) {
   for (i=0; i< nLEDs; i++) {
     d = 0x80;          // set the latch bit
     // calculate the next LED's byte
-    if (pwmcounter < redPWM[i]) {
+    if (pwmcounter < redPWM[i] >> PWMshifter) {
       d |= 0x04;
     }
-    if (pwmcounter < greenPWM[i]) {
+    if (pwmcounter < greenPWM[i] >> PWMshifter) {
       d |= 0x10;
     }
-    if (pwmcounter < bluePWM[i]) {
+    if (pwmcounter < bluePWM[i] >> PWMshifter) {
       d |= 0x01;
     }
 
@@ -216,6 +220,26 @@ void HL1606stripPWM::setPWMbits(uint8_t b) {
 
 uint8_t HL1606stripPWM::getPWMbits(void) {
   return PWMbits;
+}
+
+void HL1606stripPWM::setBrightness(uint8_t b) {
+  PWMshifter = 8 - b;
+}
+
+uint8_t HL1606stripPWM::getBrightness(void) {
+  return 8 - PWMshifter;
+}
+
+uint8_t HL1606stripPWM::nextBrightness(void) {
+  int next = this->getBrightness() - 1;
+  if (next < 0) {
+    next = 8;
+  } else if (next < 8 - this->getPWMbits()) {
+    // Only move to the next discernable brightness level.
+    next = 0;
+  }
+  this->setBrightness(next);
+  return next;
 }
 
 
