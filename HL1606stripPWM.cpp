@@ -108,6 +108,12 @@ void HL1606stripPWM::set(uint8_t n, uint32_t color) {
   this->setLEDcolorPWM(n, color);
 }
 
+uint32_t HL1606stripPWM::get(uint8_t n) {
+  return ((uint32_t)redPWM[n] << 16 & 0xff0000) |
+         ((uint32_t)greenPWM[n] << 8 & 0x00ff00) |
+         ((uint32_t)bluePWM[n] << 0 & 0x0000ff);
+}
+
 #if defined(__AVR_ATmega32U4__)
 ISR(TIMER3_COMPA_vect) {
 #else

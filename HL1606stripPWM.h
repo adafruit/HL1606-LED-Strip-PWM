@@ -67,6 +67,7 @@ class HL1606stripPWM {
   void setLEDcolorPWM(uint8_t n, uint32_t color);
   // Just a shorter name for the function above.
   void set(uint8_t n, uint32_t color);
+  uint32_t get(uint8_t n);
   uint8_t numLEDs(void);
 
   void setSPIdivider(uint8_t div);
