@@ -1,6 +1,10 @@
 // (c) Adafruit Industries / Limor Fried 2010. Released under MIT license.
 
-#include <WProgram.h>
+#if ARDUINO >= 100
+ #include "Arduino.h"
+#else
+ #include "WProgram.h"
+#endif
 
 // some spi defines
 // Classic Arduinos
