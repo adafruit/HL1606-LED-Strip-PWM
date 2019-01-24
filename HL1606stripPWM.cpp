@@ -54,6 +54,16 @@ void HL1606stripPWM::begin(void) {
 #endif
 }
 
+void HL1606stripPWM::end(void) {
+#if defined(__AVR_ATmega32U4__) 
+    TIMSK3 = (0 << OCIE3A);
+#else
+    TIMSK2 = (0 << OCIE2A);
+#endif
+
+    SPCR = _spcr;
+}
+
 
 void HL1606stripPWM::timerinit(void) {
   // calculate how long it will take to pulse one strip down
@@ -145,6 +155,7 @@ void HL1606stripPWM::SPIinit(void) {
   // set up high speed SPI for 500 KHz
   // The datasheet says that the clock pulse width must be > 300ns. Two pulses > 600ns that would
   // make the max frequency 1.6 MHz - fat chance getting that out of HL1606's though
+  _spcr = SPCR;
   SPCR = _BV(SPE) | _BV(MSTR);   // enable SPI master mode
   setSPIdivider(SPIspeedDiv);          // SPI clock is FCPU/32 = 500 Khz for most arduinos
   

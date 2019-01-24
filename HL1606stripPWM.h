@@ -37,6 +37,8 @@
 
 class HL1606stripPWM {
  private:
+  uint8_t _spcr;
+
   // How many bits of color per LED for PWM?
   // if its set to 2 bits/LED that means 6 bit color (since there are 3 LEDs)
   // if its set to 3 bits/LED that equals 9 bit color
@@ -65,6 +67,7 @@ class HL1606stripPWM {
  public:
   HL1606stripPWM(uint8_t nLEDs, uint8_t latch);
   void begin(void);
+  void end(void);
   void setLEDcolorPWM(uint8_t n, uint8_t r, uint8_t g, uint8_t b);
   uint8_t numLEDs(void);
 
