@@ -1,3 +1,7 @@
+THIS LIBRARY HAS BEEN DEPRECATED, NOBODY USES HL1606 ANYMORE :)
+
+---------------------------------------------------------------
+
 This Arduino Library will let you PWM color-control an HL1606-based RGB LED strip. 
 Its capable of 3, 4 or even 5 bit color per LED (9, 12, 15 bit RGB) depending on the length of the strip
 
